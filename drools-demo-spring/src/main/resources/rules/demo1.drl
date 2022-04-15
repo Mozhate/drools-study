@@ -1,0 +1,38 @@
+// 规则包需要可kmodule文件下kbase的packages属性保持，否则读取不到
+package demo1
+// 导入类
+import com.laher.study.drools.entity.Order
+import com.laher.study.drools.entity.Item
+// 不满足200消费
+// 规则名称，不可重复
+rule NoDiscount
+when
+    // 获取Order对象
+    $o:Order()
+    // doubleValue 返回结果必须小于200是Integer类型
+    // from accumulate 数据源为Item，而Item的数据源为$o.getItems()的属性
+    // 求和Item中的money属性
+    // 用法：accumulate( <source pattern>; <functions> [;<constraints>] )
+    $sum:Integer(doubleValue<200) from accumulate(Item($money:getMoney())from $o.items,sum($money))
+then
+    // 满足条件执行操作
+    $o.money = $sum;
+    $o.actualMoney = $sum;
+end
+// 产品满足200减30优惠
+// 规则名称，不可重复
+rule IsDiscount
+when
+    // 获取Order对象
+    $o:Order()
+    // doubleValue 返回结果必须大于等于200是Integer类型
+    // from accumulate 数据源为Item，而Item的数据源为$o.getItems()的属性
+    // 求和Item中的money属性
+    // accumulate( <source pattern>; <functions> [;<constraints>] )
+    $sum:Integer(doubleValue>=200) from accumulate(Item($money:getMoney())from $o.items,sum($money))
+then
+    // 满足条件执行操作
+    $o.money = $sum;
+    $o.preferentialMoney = 30;
+    $o.actualMoney = $sum - $o.preferentialMoney;
+end
