@@ -1,0 +1,16 @@
+package org.drools.example.api.marketing.process
+
+import com.laher.study.drools.automarketing.process.Builder
+import com.laher.study.drools.automarketing.entity.User
+
+global java.io.PrintStream out
+
+rule "用户执行结束规则" when
+    builder : Builder(currModule.moduleName == "结束组件")
+    user : User()
+then
+    out.println(user.name + " 进入: " +  builder.currModule.moduleName );
+
+    // 下一步
+    insert(builder.nextBuilder);
+end

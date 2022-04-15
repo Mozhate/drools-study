@@ -1,0 +1,19 @@
+package org.drools.example.api.marketing.process
+
+import com.laher.study.drools.automarketing.process.Builder
+import com.laher.study.drools.automarketing.entity.User
+import com.laher.study.drools.automarketing.components.IntegralModule
+
+global java.io.PrintStream out
+
+rule "用户执行积分规则" when
+    builder : Builder(currModule.moduleName == "积分组件")
+    user : User()
+then
+	IntegralModule integralModule = (IntegralModule)builder.currModule;
+    out.println(user.name + " 获得积分: " +  integralModule.value);
+    user.integral += integralModule.value;
+
+    // 下一步
+    insert(builder.nextBuilder);
+end

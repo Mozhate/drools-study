@@ -1,0 +1,19 @@
+package org.drools.example.api.marketing.process
+
+import com.laher.study.drools.automarketing.process.Builder
+import com.laher.study.drools.automarketing.entity.User
+import com.laher.study.drools.automarketing.components.CouponModule
+
+global java.io.PrintStream out
+
+rule "用户执行优惠券规则" when
+    builder : Builder(currModule.moduleName == "优惠券组件")
+    user : User()
+then
+	CouponModule couponModule = (CouponModule)builder.currModule;
+    out.println(user.name + " 获取优惠券: " +  couponModule.couponName);
+    user.addCoupon(couponModule.couponName);
+
+    // 下一步
+    insert(builder.nextBuilder);
+end

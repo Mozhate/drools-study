@@ -1,0 +1,37 @@
+package org.drools.example.api.marketing.process
+
+import com.laher.study.drools.automarketing.process.BuilderCondition
+import com.laher.study.drools.automarketing.components.ConditionModule
+import com.laher.study.drools.automarketing.entity.User
+
+global java.io.PrintStream out
+
+rule "用户执行条件-规则" when
+    builder : BuilderCondition(currModule.moduleName == "条件组件")
+    user : User()
+then
+    ConditionModule module = (ConditionModule) builder.currModule;
+    out.println(user.name + " 进入: " +  builder.currModule.moduleName + " 校验 "+ module.cond);
+
+	// 结果
+	boolean is = false;
+	// 获取用户字段值
+	Comparable userValue = user.getValue(module.cond);
+
+	switch (module.symbol){
+		case ">":
+			is = userValue.compareTo(module.value) > 0;
+			break;
+		case "=":
+			is = userValue.compareTo(module.value) == 0;
+			break;
+		case "<":
+			is = userValue.compareTo(module.value) < 0;
+			break;
+	}
+
+	out.println("--条件组件判断："+userValue+module.symbol+module.value+" 结果："+is);
+
+	// 下一步 通过is 判断成功 or 失败
+	insert(is?builder.okBuilder:builder.noBuilder);
+end
